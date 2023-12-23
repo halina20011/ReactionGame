@@ -1,0 +1,6 @@
+src/main.c:10:use USI not software/bit banged SPI
+src/main.c:12:use one SPI with chip select
+src/main.c:13:button on pb2
+src/main.c:14:sleep mode
+src/display.c:4:make display event timer driven
+src/display.c:5:remap the pins before compilation

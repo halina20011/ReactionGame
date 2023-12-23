@@ -1,0 +1,6 @@
+build/
+ReactionGameBoard/*.lck
+ReactionGameBoard/fp-info-cache
+ReactionGameBoard/Output/
+ReactionGameBoard/reactionGameBoard-backups
+ReactionGameBoard/generate.sh
