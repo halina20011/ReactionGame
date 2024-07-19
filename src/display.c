@@ -1,104 +1,102 @@
 #include "display.h"
 #include "pins.h"
 
-// TODO: make display event timer driven
-// TODO: remap the pins before compilation
-//     A
-//   ----
-// F|    | B
-//  |    |
-//   ----
-// E| G  | C
-//  |    |
-//   ---
-//    D
-const uint8_t DIGIT_MAP[11] = {
-    0b11111100, // 0
-    0b01100000, // 1
-    0b11011010, // 2
-    0b11110010, // 3
-    0b01100110, // 4
-    0b10110110, // 5
-    0b10111110, // 6
-    0b11100000, // 7
+#define CHAR_SIZE 11
+const uint8_t charMap[CHAR_SIZE] = {
+    0b01111110, // 0
+    0b00100010, // 1
+    0b10111100, // 2
+    0b10111010, // 3
+    0b11100010, // 4
+    0b11011010, // 5
+    0b11011110, // 6
+    0b00110010, // 7
     0b11111110, // 8
-    0b11100110, // 9
-    0b00000000  // 10
+    0b11110010, // 9
+    0b00000000, // 10
 };
 
 #define ANIMATION_SIZE 6
 const uint8_t animation[ANIMATION_SIZE] = {
-    0b10000000,
-    0b01000000,
-    0b00100000,
     0b00010000,
+    0b00100000,
+    0b00000010,
     0b00001000,
     0b00000100,
+    0b01000000,
 };
 
-#define A   2
-#define B   0
-#define C   4
-#define D   6
-#define E   7
-#define F   1
-#define G   3
-#define DP  5
-
-#define EXTRACT(oPosition, number) (((1 << (7 - oPosition)) & number) != 0)
-#define REMAP(oPosition, nPosition, number) (EXTRACT(oPosition, number) << (7 - nPosition));
-
-uint8_t reverse(uint8_t b){
-    b = (b & 0b11110000) >> 4 | (b & 0b00001111) << 4;
-    b = (b & 0b11001100) >> 2 | (b & 0b00110011) << 2;
-    b = (b & 0b10101010) >> 1 | (b & 0b01010101) << 1;
-
-    return b;
-}
-
-uint8_t remap(uint8_t o){
-    uint8_t mapped = 0;
-    mapped |= REMAP(0, A, o);
-    mapped |= REMAP(1, B, o);
-    mapped |= REMAP(2, C, o);
-    mapped |= REMAP(3, D, o);
-    mapped |= REMAP(4, E, o);
-    mapped |= REMAP(5, F, o);
-    mapped |= REMAP(6, G, o);
-    mapped |= REMAP(7, DP, o);
-    return mapped;
-}
-
-const uint8_t DISPLAY_PINS[DISPLAY_SIZE] = {
-    DP4, DP3, DP2, DP1
+struct{
+    int8_t index;
+    struct Segment segments[DISPLAY_SIZE];
+} display = {
+    0,
+    {
+        {CLEAR, &DP4_DDR, &DP4_PORT, DP4},
+        {CLEAR, &DP3_DDR, &DP3_PORT, DP3},
+        {CLEAR, &DP2_DDR, &DP2_PORT, DP2},
+        {CLEAR, &DP1_DDR, &DP1_PORT, DP1},
+    };
 };
 
 void initDisplay(){
-    CLOCK_DDR |= (1 << CLOCK);
-    LATCH_DDR |= (1 << LATCH);
-    DATA_PORT |= (1 << DATA);
-    DP_DDR |= ((1 << DP1) | (1 << DP2) | (1 << DP3) | (1 << DP4));
-    DP_PORT |= (1 << DP1) | (1 << DP2) | (1 << DP3) | (1 << DP4);
+    DP4_DDR |= (1 << DP4);
+    DP3_DDR |= (1 << DP3);
+    DP2_DDR |= (1 << DP2);
+    DP1_DDR |= (1 << DP1);
+
+    DP4_PORT |= (1 << DP4);
+    DP3_PORT |= (1 << DP3);
+    DP2_PORT |= (1 << DP2);
+    DP1_PORT |= (1 << DP1);
 }
 
-uint8_t showDigit(struct SSPI sSPI, uint8_t n){
-    uint8_t digit = (n < 10) ? n : 10;
-    uint8_t remaped = reverse(remap(DIGIT_MAP[digit]));
-    sendSSPI(sSPI, remaped);
-    return remaped;
+void enableDisplay(){
+    TCCR1A |= (1 << WGM12); // set CTC mode
+    // prescaler 8000000 / 1024 = 7812.5
+    // clock = 8000000
+    // pre = 1024
+    // f = (clock/pre) / (1 + OCR1A)
+    // f = (8000000/1024) / (1 + 99)
+    // f = 78.125 Hz
+    // d = 1 / f
+    // d = 1 / 78.125 = 0.0128 s
+    TCCR1B |= (1 << CS12) | (1 << CS10); // prescaler 1024
+    OCR1A = 99;
+
+    TIMSK1 |= (1 << OCIE1A); // enable Output COmpare Interrupt Enable Timer/Counter1 A
+    TIFR1 |= (1 << OCF1A); // fire
 }
 
-void displayShow(struct SSPI sSPI, uint16_t n){
-    // make sure that all display ports are off
-    DP_PORT |= (1 << DP1) | (1 << DP2) | (1 << DP3) | (1 << DP4);
+void dissableDisplay(){
+    TIMSK1 &= ~(1 << OCIE1A);
+}
+
+Segment curr;
+ISR(TIM1_COMPA_vect){
+    curr = display.segments[display.index++];
+
+    DP4_PORT |= (1 << DP4);
+    DP3_PORT |= (1 << DP3);
+    DP2_PORT |= (1 << DP2);
+    DP1_PORT |= (1 << DP1);
+
+    *(curr.dpPORT) &= ~(1 << curr.dp);
+    sendSPI(curr.data, &CSD_PORT, CSD);
+    if(DISPLAY_SIZE <= display.index){
+        display.index = 0;
+    }
+}
+
+void displayUpdate(uint16_t n){
+    int8_t index = 0;
     
-    for(uint8_t i = 0; i < DISPLAY_SIZE && n; i++){
-        DP_PORT &= ~(1U << DISPLAY_PINS[i]);
-        uint8_t d = n % 10;
-        showDigit(sSPI, d);
+    while(n){
+        display.segments[index++].data = charMap[n % 10];
         n /= 10;
-        _delay_ms(DISPLAY_DELAY);
-        DP_PORT |= (1 << DISPLAY_PINS[i]);
-        _delay_ms(DISPLAY_DELAY);
+    }
+
+    for(;index < DISPLAY_SIZE; index++){
+        display.segments[index].data = charMap[0];
     }
 }

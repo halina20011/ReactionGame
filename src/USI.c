@@ -2,21 +2,21 @@
 
 #include <avr/interrupt.h>
 
-ISR(TIM0_COMPA_vect){
-    USICR |= (1 << USITC);
-}
-
-ISR(USI_OVF_vect){
-    TIMSK0 &= ~(1U << OCIE0A);
-
-    USISR = (1 << USIOIF);
-    // uint8_t data = USIDR;
-}
+// ISR(TIM0_COMPA_vect){
+//     USICR |= (1 << USITC);
+// }
+//
+// ISR(USI_OVF_vect){
+//     TIMSK0 &= ~(1U << OCIE0A);
+//
+//     USISR = (1 << USIOIF);
+//     // uint8_t data = USIDR;
+// }
 
 void initUSI(){
-    SPI_DDR |= (1 << MISO) | (1 << SCK); // Outputs
-    SPI_DDR &= ~(1U << MOSI); // Input
-    SPI_PORT |= (1 << MOSI); // Pull-up
+    SPI_DDR |= (1 << MOSI) | (1 << SCK); // Outputs
+    SPI_DDR &= ~(1U << MISO); // Input
+    SPI_PORT |= (1 << MISO); // Pull-up
 
     // set three wire mode
     USICR |= (1 << USIOIE);

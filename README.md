@@ -1,7 +1,11 @@
 # Reaction Game
 
+### Images
+<img src="./Images/boardPreview1.png" alt="boardPreview1.png" width="50%">
+<img src="./Images/boardPreview2.png" alt="boardPreview2.png" width="50%">
+
 ## Datasheet
-Arriny24A: <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny24A-44A-84A-DataSheet-DS40002269A.pdf">ATtiny24A-44A-84A-DataSheet.pdf</a>
+ATtiny24A: <a href="https://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny24A-44A-84A-DataSheet-DS40002269A.pdf">ATtiny24A-44A-84A-DataSheet.pdf</a>
 
 ## Removing 8 clock prescaler
 `avrdude -p t24a -c avrisp -P /dev/ttyUSB0 -b 19200 -U lfuse:w:0b11100010:m`
@@ -15,7 +19,7 @@ I = 2/220
 I = 0.009A
 I = 9mA
 
-# Flash
+## Flash
 I am using Arduino Uno as ISP (in system programmer) </br>
 To flash code to the board connect Arduino Uno and the 6 pin header (from left top going clockwise)
 Arduino Uno | 6 pin header
@@ -29,7 +33,7 @@ GND         | GND
 
 `make flash`
 
-# Components
+## Components
 Name                            | Net   | Cost
 ------------------------------- | ----- | ----
 Attiny24A-U                     | 1x    | x

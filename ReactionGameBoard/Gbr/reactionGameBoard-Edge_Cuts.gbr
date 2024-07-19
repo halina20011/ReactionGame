@@ -1,11 +1,11 @@
 G04 #@! TF.GenerationSoftware,KiCad,Pcbnew,7.0.9*
-G04 #@! TF.CreationDate,2023-12-16T19:08:37+01:00*
+G04 #@! TF.CreationDate,2023-12-24T13:53:04+01:00*
 G04 #@! TF.ProjectId,reactionGameBoard,72656163-7469-46f6-9e47-616d65426f61,rev?*
-G04 #@! TF.SameCoordinates,PX243d580PY50343a0*
+G04 #@! TF.SameCoordinates,PX1c9c380PY399a180*
 G04 #@! TF.FileFunction,Profile,NP*
 %FSLAX46Y46*%
 G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
-G04 Created by KiCad (PCBNEW 7.0.9) date 2023-12-16 19:08:37*
+G04 Created by KiCad (PCBNEW 7.0.9) date 2023-12-24 13:53:04*
 %MOMM*%
 %LPD*%
 G01*
@@ -15,9 +15,9 @@ G04 #@! TA.AperFunction,Profile*
 G04 #@! TD*
 G04 APERTURE END LIST*
 D10*
-X0Y49700000D02*
-X53000000Y49700000D01*
+X0Y37500000D02*
+X53000000Y37500000D01*
 X53000000Y0D01*
 X0Y0D01*
-X0Y49700000D01*
+X0Y37500000D01*
 M02*

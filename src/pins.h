@@ -9,25 +9,30 @@
 #define MISO        PA5
 #define MOSI        PA6
 
-// CLOCK for 74HC595
-#define CLOCK_DDR   DDRB
-#define CLOCK_PORT  PORTB
-#define CLOCK       PB0
+#define CSS_DDR     DDRB
+#define CSS_PORT    PORTB
+#define CSS         PB0
+#define CSD_DDR     DDRA
+#define CSD_PORT    PORTA
+#define CSD         PA3
 
-#define LATCH_DDR   DDRB
-#define LATCH_PORT  PORTB
-#define LATCH       PB1
+// TODO: move DP3 to PA7
+// display pins
+#define DP1_DDR     DDRA
+#define DP1_PORT    PORTA
+#define DP1         PA1
 
-#define DATA_DDR    DDRB
-#define DATA_PORT   PORTB
-#define DATA        PB2
+#define DP2_DDR     DDRA
+#define DP2_PORT    PORTA
+#define DP2         PA0
 
-#define DP1         PA2
-#define DP2         PA3
-#define DP3         PA7
-#define DP4         PA1
-#define DP_DDR      DDRA
-#define DP_PORT     PORTA
+#define DP3_DDR     DDRB
+#define DP3_PORT    PORTB
+#define DP3         PB2
+
+#define DP4_DDR     DDRA
+#define DP4_PORT    PORTA
+#define DP4         PA2
 
 #define BUTTON_DDR  DDRA
 #define BUTTON_PORT PORTA
